@@ -1,0 +1,25 @@
+language: generic
+os: linux
+dist: xenial
+services:
+  - docker
+
+before_install:
+  - docker build -t bryansmullen/multi-docker -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true bryansmullen/multi-docker npm run test
+
+after_success:
+  # Build docker images
+  - docker build -t bryansmullen/multi-client ./client
+  - docker build -t bryansmullen/multi-server ./server
+  - docker build -t bryansmullen/multi-worker ./worker
+  - docker build -t bryansmullen/multi-nginx ./nginx
+  # Log in to docker cli
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Push to docker hub
+  - docker push bryansmullen/multi-client
+  - docker push bryansmullen/multi-server
+  - docker push bryansmullen/multi-worker
+  - docker push bryansmullen/multi-nginx
