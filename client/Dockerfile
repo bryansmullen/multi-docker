@@ -1,4 +1,4 @@
-FROM node:16-alpine as builder
+FROM node:16-alpine
 USER node
 RUN mkdir -p /home/node/app
 WORKDIR /home/node/app
@@ -10,4 +10,4 @@ RUN npm run build
 FROM nginx
 EXPOSE 3000
 COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY --from=builder /home/node/app/build /usr/share/nginx/html
+COPY --from=0 /home/node/app/build /usr/share/nginx/html
